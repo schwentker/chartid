@@ -10,7 +10,7 @@ An open AT Protocol Lexicon for astrological charts as self-sovereign identity r
 
 ## What this is
 
-Every AT Protocol user has a DID. Their astrological chart — if they want one — should live in their own repo, portable across the entire Atmosphere, not locked inside any single app.
+Every AT Protocol user has a DID. Their astrological chart - if they want one — should live in their own repo, portable across the entire Atmosphere, not locked inside any single app.
 
 `space.chartid.*` defines the data model. No app owns the records. No app owns the standard.
 
@@ -120,13 +120,15 @@ A chart with `timeConfidence: "unknown"` is a valid, useful partial record — r
 
 [chartid.space](https://chartid.space) — protocol overview, demo `space.chartid.natalChart` record rendered as a North Indian Jyotish chart, full Lexicon namespace listing. Hosted on Cloudflare Pages from this repo (`index.html`).
 
-### First working implementation
+### Implementations
 
-[Artiji](https://artiji.xyz) — hyperpersonalized astrological greeting cards — is the first app writing `space.chartid.natalChart` records. Charts generated at card creation can be saved to the user's ATProto repo via "Save chart to ATProto" at card creation.
+**[jyotish-mcp](https://sandboxlabs.ai/jyotish-calc)** — reference calculator.
+Swiss Ephemeris, TypeScript, Lahiri ayanamsa. Produces ChartID-format
+Jyotish output. Vimshottari dasha calculation.
 
-### Reference calculator
-
-[jyotish-mcp](https://sandboxlabs.ai/jyotish-calc) — Swiss Ephemeris backed TypeScript MCP server producing Jyotish chart data in ChartID format. Lahiri ayanamsa. Sidereal ascendant math. Vimshottari dasha calculation.
+**[Artiji](https://artiji.xyz)** — first consumer app writing
+`space.chartid.natalChart` records. Astrological greeting card platform;
+chart data generated at card creation, written to user ATProto repo on consent.
 
 ---
 
