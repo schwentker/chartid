@@ -5,5 +5,5 @@ compatibility_date = "2024-04-01"
 directory = "."
 
 [[routes]]
-pattern = "chartid.space/*"
+pattern = "chartid.space"
 custom_domain = true
