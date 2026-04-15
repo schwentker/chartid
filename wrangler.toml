@@ -1,9 +1,10 @@
-name = "chartid-worker"
+name = "chartid"  # Changed to match what CI expects
 compatibility_date = "2024-04-01"
 
 [assets]
-directory = "."
+directory = "./public"
 
 [[routes]]
 pattern = "chartid.space"
 custom_domain = true
+override_existing_dns_record = true
