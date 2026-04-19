@@ -1,0 +1,48 @@
+{
+  "lexicon": 1,
+  "id": "space.chartid.settings",
+  "description": "User settings for ChartID. One record per user (key: 'self'). Specifies which chart to display as primary, privacy defaults, and astrology profile metadata.",
+  "defs": {
+    "record": {
+      "type": "record",
+      "key": "self",
+      "description": "User profile and preference settings. Exactly one per DID. Apps query this record to find which natalChart to display on a user's profile.",
+      "properties": {
+        "primaryChartUri": {
+          "type": "string",
+          "description": "AT URI of the primary natal chart to display on profile, e.g. 'at://did:plc:xxx/space.chartid.natalChart/rkey'. If absent, apps may fall back to the most recent natalChart record."
+        },
+        "defaultVisibility": {
+          "type": "string",
+          "knownValues": ["public", "private", "friends"],
+          "description": "Default visibility for new charts posted by this user. Applies when creating new natalChart records without an explicit visibility field."
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "Optional display name for the user's astrology profile, e.g. 'Maya's Natal Chart'."
+        },
+        "bio": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "Optional bio describing the user's astrological approach, traditions practiced, or background."
+        },
+        "traditions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Astrological traditions the user practices, e.g. ['jyotish', 'western', 'hellenistic']. Informs app UI defaults and chart generation."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Timestamp when this settings record was first created (ISO 8601)."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Timestamp when this settings record was last updated (ISO 8601)."
+        }
+      }
+    }
+  }
+}

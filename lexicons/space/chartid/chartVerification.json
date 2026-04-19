@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "space.chartid.chartVerification",
+  "description": "Verification attestation for a natal chart record. Professional astrologers or trusted sources can attest to chart accuracy. Attestations are separate records (composable, queryable) so multiple sources can verify the same chart. The verifier's DID is public, creating accountability.",
+  "defs": {
+    "record": {
+      "type": "record",
+      "key": "tid",
+      "description": "Attestation record linking a verifier DID to a natalChart record. Can be created by professional astrologers, institutions, or the chart subject themselves.",
+      "required": ["chartUri", "verifierDid", "verificationLabel", "createdAt"],
+      "properties": {
+        "chartUri": {
+          "type": "string",
+          "description": "AT URI of the natalChart record being verified, e.g. 'at://did:plc:xxx/space.chartid.natalChart/rkey'."
+        },
+        "verifierDid": {
+          "type": "string",
+          "description": "DID of the person or institution performing the verification, e.g. a professional astrologer's DID."
+        },
+        "verificationLabel": {
+          "type": "string",
+          "knownValues": [
+            "birth-certificate-verified",
+            "astrologer-attested",
+            "historical-figure",
+            "self-declared"
+          ],
+          "description": "Type of verification performed. 'birth-certificate-verified' = verified against official birth document. 'astrologer-attested' = professional astrologer confirms accuracy. 'historical-figure' = verified data for a public historical person. 'self-declared' = user-provided, unverified."
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "Optional notes from the verifier, e.g. 'Verified against hospital birth record on file'."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Timestamp when this attestation was created (ISO 8601)."
+        }
+      }
+    }
+  }
+}

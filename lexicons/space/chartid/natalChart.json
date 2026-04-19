@@ -1,0 +1,255 @@
+{
+  "lexicon": 1,
+  "id": "space.chartid.natalChart",
+  "description": "Birth chart record. Birth data plus astrological placements. key: 'tid' — users can hold multiple (Western, Jyotish, rectified versions). Birth date and time are PII; see PRIVACY.md for encryption guidance.",
+  "defs": {
+    "coordinate": {
+      "type": "object",
+      "description": "Geographic coordinate as decimal degree strings (no floats per ATProto spec).",
+      "required": ["latitude", "longitude"],
+      "properties": {
+        "latitude": {
+          "type": "string",
+          "description": "Decimal degrees, e.g. '37.804363'. Negative = south."
+        },
+        "longitude": {
+          "type": "string",
+          "description": "Decimal degrees, e.g. '-122.271111'. Negative = west."
+        }
+      }
+    },
+    "birthPlace": {
+      "type": "object",
+      "description": "Location of birth.",
+      "required": ["placeName"],
+      "properties": {
+        "placeName": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "Human-readable place name, e.g. 'Oakland, CA, USA'."
+        },
+        "coordinate": {
+          "type": "ref",
+          "ref": "#coordinate"
+        },
+        "timezone": {
+          "type": "string",
+          "description": "IANA timezone identifier, e.g. 'America/Los_Angeles'."
+        }
+      }
+    },
+    "bodyPosition": {
+      "type": "object",
+      "description": "Position of a celestial body.",
+      "required": ["body", "longitude", "sign"],
+      "properties": {
+        "body": {
+          "type": "string",
+          "description": "Celestial body name, e.g. 'Sun', 'Moon', 'Rahu'."
+        },
+        "longitude": {
+          "type": "string",
+          "description": "Ecliptic longitude as decimal degree string, e.g. '254.378500'."
+        },
+        "sign": {
+          "type": "string",
+          "description": "Zodiac sign name."
+        },
+        "nakshatra": {
+          "type": "integer",
+          "description": "Nakshatra index 1–27 (Jyotish)."
+        },
+        "nakshatraName": {
+          "type": "string",
+          "description": "Nakshatra name (Jyotish)."
+        },
+        "isRetrograde": {
+          "type": "boolean",
+          "description": "True if the body is retrograde."
+        },
+        "isCombust": {
+          "type": "boolean",
+          "description": "True if the body is combust (Jyotish)."
+        }
+      }
+    },
+    "houseCusp": {
+      "type": "object",
+      "description": "House cusp position.",
+      "required": ["house", "longitude", "sign"],
+      "properties": {
+        "house": {
+          "type": "integer",
+          "description": "House number 1–12."
+        },
+        "longitude": {
+          "type": "string",
+          "description": "Ecliptic longitude of the cusp as decimal degree string."
+        },
+        "sign": {
+          "type": "string",
+          "description": "Zodiac sign on the cusp."
+        }
+      }
+    },
+    "westernData": {
+      "type": "object",
+      "description": "Western tropical astrological data.",
+      "properties": {
+        "houseSystem": {
+          "type": "string",
+          "description": "House system used, e.g. 'Placidus', 'WholeSign', 'Koch'."
+        },
+        "ascendant": {
+          "type": "string",
+          "description": "Ascendant degree as decimal degree string."
+        },
+        "midheaven": {
+          "type": "string",
+          "description": "Midheaven (MC) degree as decimal degree string."
+        },
+        "planets": {
+          "type": "array",
+          "items": { "type": "ref", "ref": "#bodyPosition" },
+          "description": "Planetary positions."
+        },
+        "houseCusps": {
+          "type": "array",
+          "items": { "type": "ref", "ref": "#houseCusp" },
+          "description": "House cusp positions."
+        },
+        "extensions": {
+          "type": "unknown",
+          "description": "Extension point for tradition-specific fields not yet in spec (e.g., Hellenistic lots, Uranian midpoints)."
+        }
+      }
+    },
+    "jyotishData": {
+      "type": "object",
+      "description": "Jyotish (Vedic) astrological data.",
+      "properties": {
+        "ayanamsa": {
+          "type": "string",
+          "description": "Ayanamsa system used, e.g. 'Lahiri', 'Raman', 'KP'."
+        },
+        "ayanamsaDegrees": {
+          "type": "string",
+          "description": "Ayanamsa value at birth as decimal degree string."
+        },
+        "houseSystem": {
+          "type": "string",
+          "description": "House system used, e.g. 'WholeSign', 'Equal'."
+        },
+        "ascendant": {
+          "type": "string",
+          "description": "Lagna degree as decimal degree string."
+        },
+        "planets": {
+          "type": "array",
+          "items": { "type": "ref", "ref": "#bodyPosition" },
+          "description": "Planetary positions (sidereal)."
+        },
+        "houseCusps": {
+          "type": "array",
+          "items": { "type": "ref", "ref": "#houseCusp" },
+          "description": "House cusp positions."
+        },
+        "vargaCharts": {
+          "type": "array",
+          "items": { "type": "unknown" },
+          "description": "Divisional chart data (D-2, D-9, D-10, etc.)."
+        },
+        "dashaTree": {
+          "type": "unknown",
+          "description": "Vimshottari dasha tree."
+        },
+        "extensions": {
+          "type": "unknown",
+          "description": "Extension point for tradition-specific fields (e.g., shadbala scores, ashtakavarga)."
+        }
+      }
+    },
+    "record": {
+      "type": "record",
+      "key": "tid",
+      "description": "Natal chart record. Birth data + astrological placements. Users may hold multiple records (Western, Jyotish, rectified). Birth datetime is PII — see PRIVACY.md.",
+      "required": ["schemaVersion", "traditions", "createdAt"],
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "const": "1.0.0",
+          "description": "Schema version. Breaking changes increment to 2.0.0 in a new lexicon file; old records remain valid under old readers."
+        },
+        "traditions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Astrological traditions represented in this record, e.g. ['western', 'jyotish']. One record can carry multiple traditions simultaneously."
+        },
+        "birthDatetime": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Birth date and time (ISO 8601). Optional — omit if unknown. For privacy, consider encrypting as JWE before posting if visibility='private'. See PRIVACY.md for implementation guidance."
+        },
+        "birthTimeTrust": {
+          "type": "string",
+          "knownValues": ["exact", "approximate", "unknown"],
+          "description": "Confidence level of birth time. 'exact' = birth certificate or hospital record, 'approximate' = family memory or close estimate, 'unknown' = time not available."
+        },
+        "timeConfidence": {
+          "type": "string",
+          "knownValues": ["exact", "approximate", "unknown", "rectified"],
+          "description": "Reliability of birth time. 'exact' = birth certificate, 'approximate' = family memory, 'unknown' = date known time not, 'rectified' = time derived by rectification (see rectificationNote)."
+        },
+        "rectificationNote": {
+          "type": "string",
+          "maxLength": 512,
+          "description": "Explanation of the rectification method used, if timeConfidence='rectified'."
+        },
+        "roddenRating": {
+          "type": "string",
+          "knownValues": ["AA", "A", "B", "C", "DD", "X", "XX"],
+          "description": "Rodden Rating for source reliability (Western tradition). AA = birth certificate, X = unknown."
+        },
+        "birthPlace": {
+          "type": "ref",
+          "ref": "#birthPlace"
+        },
+        "subjectDid": {
+          "type": "string",
+          "description": "AT Protocol DID of the person whose chart this is. Optional — linking a DID to a chart requires explicit consent. Can be self-referential (user posting their own chart)."
+        },
+        "attestedBy": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Array of DIDs of astrologers who have attested to this chart's accuracy. Each attesting DID is expected to publish a corresponding space.chartid.chartVerification record."
+        },
+        "western": {
+          "type": "ref",
+          "ref": "#westernData"
+        },
+        "jyotish": {
+          "type": "ref",
+          "ref": "#jyotishData"
+        },
+        "visibility": {
+          "type": "string",
+          "knownValues": ["public", "private", "friends"],
+          "description": "Who can see this chart. 'public' = anyone on ATProto. 'private' = only the DID owner (use encryptedData for stronger protection). 'friends' = social graph access (future feature)."
+        },
+        "encryptedData": {
+          "type": "string",
+          "description": "Optional JWE-encrypted birthDatetime for private charts. When present, birthDatetime should be omitted or set to a date-only value. See PRIVACY.md for implementation."
+        },
+        "extensions": {
+          "type": "unknown",
+          "description": "Extension point for fields not yet in spec. Tradition-specific extras go in western.extensions or jyotish.extensions."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Timestamp when this record was created (ISO 8601)."
+        }
+      }
+    }
+  }
+}
