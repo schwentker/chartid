@@ -1,0 +1,103 @@
+{
+  "lexicon": 1,
+  "id": "space.chartid.entityChart",
+  "description": "Chart for an organization, country, institution, or non-human entity. entityName is required. Uses founding or incorporation datetime. No subject DID.",
+  "defs": {
+    "record": {
+      "type": "record",
+      "key": "tid",
+      "description": "Astrological chart for an organization, country, institution, or other non-human entity. Typically cast for the moment of founding, incorporation, or formal establishment.",
+      "required": ["schemaVersion", "traditions", "entityName", "createdAt"],
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "const": "1.0.0",
+          "description": "Schema version. Breaking changes bump to 2.0.0 in a new lexicon file."
+        },
+        "traditions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Astrological traditions represented, e.g. ['western', 'jyotish']."
+        },
+        "entityName": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "Name of the entity, e.g. 'United States of America', 'Apple Inc.', 'Bluesky PBC'. Required."
+        },
+        "entityType": {
+          "type": "string",
+          "knownValues": ["country", "company", "nonprofit", "institution", "city", "treaty", "other"],
+          "description": "Classification of entity type."
+        },
+        "foundingDatetime": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Founding, incorporation, or establishment datetime (ISO 8601). Optional — some entities have uncertain founding moments."
+        },
+        "timeConfidence": {
+          "type": "string",
+          "knownValues": ["exact", "approximate", "unknown", "rectified"],
+          "description": "Reliability of the founding time. 'exact' = documented record, 'approximate' = known date but uncertain time, 'unknown' = date uncertain."
+        },
+        "foundingPlace": {
+          "type": "object",
+          "description": "Location of founding or incorporation.",
+          "properties": {
+            "placeName": { "type": "string", "maxLength": 256 },
+            "coordinate": {
+              "type": "object",
+              "properties": {
+                "latitude": { "type": "string" },
+                "longitude": { "type": "string" }
+              }
+            },
+            "timezone": { "type": "string" }
+          }
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 1024,
+          "description": "Optional notes on the entity and source of founding data."
+        },
+        "sourceUrl": {
+          "type": "string",
+          "description": "URL referencing the source of founding data (e.g., incorporation record, official history)."
+        },
+        "western": {
+          "type": "object",
+          "description": "Western tropical astrological data. See space.chartid.defs#westernData.",
+          "properties": {
+            "houseSystem": { "type": "string" },
+            "ascendant": { "type": "string" },
+            "midheaven": { "type": "string" },
+            "planets": { "type": "array", "items": { "type": "unknown" } },
+            "houseCusps": { "type": "array", "items": { "type": "unknown" } },
+            "extensions": { "type": "unknown" }
+          }
+        },
+        "jyotish": {
+          "type": "object",
+          "description": "Jyotish astrological data. See space.chartid.defs#jyotishData.",
+          "properties": {
+            "ayanamsa": { "type": "string" },
+            "ayanamsaDegrees": { "type": "string" },
+            "houseSystem": { "type": "string" },
+            "ascendant": { "type": "string" },
+            "planets": { "type": "array", "items": { "type": "unknown" } },
+            "houseCusps": { "type": "array", "items": { "type": "unknown" } },
+            "extensions": { "type": "unknown" }
+          }
+        },
+        "extensions": {
+          "type": "unknown",
+          "description": "Top-level extension point for fields not yet in spec."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Timestamp when this record was created (ISO 8601)."
+        }
+      }
+    }
+  }
+}

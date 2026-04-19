@@ -1,0 +1,98 @@
+{
+  "lexicon": 1,
+  "id": "space.chartid.electionalChart",
+  "description": "Electional (Western) or Muhurta (Jyotish) chart. Records a chosen auspicious moment for initiating an action. electionalDatetime is the elected moment — required.",
+  "defs": {
+    "record": {
+      "type": "record",
+      "key": "tid",
+      "description": "Chart for an elected or muhurta moment — a deliberately chosen auspicious time for starting an action. The chart records the moment selected, not when the selection was made.",
+      "required": ["schemaVersion", "traditions", "electionalDatetime", "createdAt"],
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "const": "1.0.0",
+          "description": "Schema version. Breaking changes bump to 2.0.0 in a new lexicon file."
+        },
+        "traditions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Astrological traditions represented, e.g. ['western'] or ['jyotish']."
+        },
+        "electionalDatetime": {
+          "type": "string",
+          "format": "datetime",
+          "description": "The elected moment — the chosen auspicious start time (ISO 8601). Required."
+        },
+        "purpose": {
+          "type": "string",
+          "maxLength": 512,
+          "description": "What the elected moment is for, e.g. 'Wedding ceremony', 'Business launch', 'Surgery', 'Property signing'."
+        },
+        "purposeType": {
+          "type": "string",
+          "knownValues": ["marriage", "business", "travel", "medical", "property", "legal", "ceremony", "other"],
+          "description": "Classification of the election's purpose."
+        },
+        "beneficiaryDid": {
+          "type": "string",
+          "description": "Optional DID of the person for whom the election was made. Set only with their consent."
+        },
+        "place": {
+          "type": "object",
+          "description": "Location for which the moment was elected.",
+          "properties": {
+            "placeName": { "type": "string", "maxLength": 256 },
+            "coordinate": {
+              "type": "object",
+              "properties": {
+                "latitude": { "type": "string" },
+                "longitude": { "type": "string" }
+              }
+            },
+            "timezone": { "type": "string" }
+          }
+        },
+        "electionNotes": {
+          "type": "string",
+          "maxLength": 1024,
+          "description": "Optional notes on the election rationale — why this moment was chosen, what factors were prioritized."
+        },
+        "western": {
+          "type": "object",
+          "description": "Western tropical astrological data for the elected moment. See space.chartid.defs#westernData.",
+          "properties": {
+            "houseSystem": { "type": "string" },
+            "ascendant": { "type": "string" },
+            "midheaven": { "type": "string" },
+            "planets": { "type": "array", "items": { "type": "unknown" } },
+            "houseCusps": { "type": "array", "items": { "type": "unknown" } },
+            "extensions": { "type": "unknown" }
+          }
+        },
+        "jyotish": {
+          "type": "object",
+          "description": "Jyotish/Muhurta data for the elected moment. See space.chartid.defs#jyotishData.",
+          "properties": {
+            "ayanamsa": { "type": "string" },
+            "ayanamsaDegrees": { "type": "string" },
+            "houseSystem": { "type": "string" },
+            "ascendant": { "type": "string" },
+            "planets": { "type": "array", "items": { "type": "unknown" } },
+            "houseCusps": { "type": "array", "items": { "type": "unknown" } },
+            "extensions": { "type": "unknown" }
+          }
+        },
+        "extensions": {
+          "type": "unknown",
+          "description": "Top-level extension point for fields not yet in spec."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Timestamp when this record was created (ISO 8601)."
+        }
+      }
+    }
+  }
+}

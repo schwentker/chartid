@@ -1,0 +1,173 @@
+{
+  "lexicon": 1,
+  "id": "space.chartid.defs",
+  "description": "Shared type definitions for space.chartid.* lexicons. Referenced via $ref across natalChart, eventChart, entityChart, horaryChart, and electionalChart.",
+  "defs": {
+    "coordinate": {
+      "type": "object",
+      "description": "Geographic coordinate as decimal degree strings. No floats per ATProto spec.",
+      "required": ["latitude", "longitude"],
+      "properties": {
+        "latitude": {
+          "type": "string",
+          "description": "Decimal degrees, e.g. '37.804363'. Negative = south."
+        },
+        "longitude": {
+          "type": "string",
+          "description": "Decimal degrees, e.g. '-122.271111'. Negative = west."
+        }
+      }
+    },
+    "place": {
+      "type": "object",
+      "description": "A geographic location with optional coordinate and timezone.",
+      "required": ["placeName"],
+      "properties": {
+        "placeName": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "Human-readable place name, e.g. 'Oakland, CA, USA'."
+        },
+        "coordinate": {
+          "type": "ref",
+          "ref": "#coordinate"
+        },
+        "timezone": {
+          "type": "string",
+          "description": "IANA timezone identifier, e.g. 'America/Los_Angeles'."
+        }
+      }
+    },
+    "bodyPosition": {
+      "type": "object",
+      "description": "Position of a celestial body at a moment in time.",
+      "required": ["body", "longitude", "sign"],
+      "properties": {
+        "body": {
+          "type": "string",
+          "description": "Celestial body name, e.g. 'Sun', 'Moon', 'Rahu'."
+        },
+        "longitude": {
+          "type": "string",
+          "description": "Ecliptic longitude as decimal degree string, e.g. '254.378500'."
+        },
+        "sign": {
+          "type": "string",
+          "description": "Zodiac sign name."
+        },
+        "nakshatra": {
+          "type": "integer",
+          "description": "Nakshatra index 1–27 (Jyotish)."
+        },
+        "nakshatraName": {
+          "type": "string",
+          "description": "Nakshatra name (Jyotish)."
+        },
+        "isRetrograde": {
+          "type": "boolean",
+          "description": "True if the body is retrograde."
+        },
+        "isCombust": {
+          "type": "boolean",
+          "description": "True if the body is combust (Jyotish)."
+        }
+      }
+    },
+    "houseCusp": {
+      "type": "object",
+      "description": "House cusp position.",
+      "required": ["house", "longitude", "sign"],
+      "properties": {
+        "house": {
+          "type": "integer",
+          "description": "House number 1–12."
+        },
+        "longitude": {
+          "type": "string",
+          "description": "Ecliptic longitude of the cusp as decimal degree string."
+        },
+        "sign": {
+          "type": "string",
+          "description": "Zodiac sign on the cusp."
+        }
+      }
+    },
+    "westernData": {
+      "type": "object",
+      "description": "Western tropical astrological data block. Used in natalChart, eventChart, entityChart.",
+      "properties": {
+        "houseSystem": {
+          "type": "string",
+          "description": "House system used, e.g. 'Placidus', 'WholeSign', 'Koch'."
+        },
+        "ascendant": {
+          "type": "string",
+          "description": "Ascendant degree as decimal degree string."
+        },
+        "midheaven": {
+          "type": "string",
+          "description": "Midheaven (MC) degree as decimal degree string."
+        },
+        "planets": {
+          "type": "array",
+          "items": { "type": "ref", "ref": "#bodyPosition" },
+          "description": "Planetary positions."
+        },
+        "houseCusps": {
+          "type": "array",
+          "items": { "type": "ref", "ref": "#houseCusp" },
+          "description": "House cusp positions."
+        },
+        "extensions": {
+          "type": "unknown",
+          "description": "Extension point for tradition-specific fields not yet in spec (e.g., Hellenistic lots, Uranian midpoints)."
+        }
+      }
+    },
+    "jyotishData": {
+      "type": "object",
+      "description": "Jyotish (Vedic) astrological data block. Used in natalChart, eventChart, entityChart.",
+      "properties": {
+        "ayanamsa": {
+          "type": "string",
+          "description": "Ayanamsa system used, e.g. 'Lahiri', 'Raman', 'KP'."
+        },
+        "ayanamsaDegrees": {
+          "type": "string",
+          "description": "Ayanamsa value at the moment as decimal degree string."
+        },
+        "houseSystem": {
+          "type": "string",
+          "description": "House system used, e.g. 'WholeSign', 'Equal'."
+        },
+        "ascendant": {
+          "type": "string",
+          "description": "Lagna degree as decimal degree string."
+        },
+        "planets": {
+          "type": "array",
+          "items": { "type": "ref", "ref": "#bodyPosition" },
+          "description": "Planetary positions (sidereal)."
+        },
+        "houseCusps": {
+          "type": "array",
+          "items": { "type": "ref", "ref": "#houseCusp" },
+          "description": "House cusp positions."
+        },
+        "vargaCharts": {
+          "type": "array",
+          "items": { "type": "unknown" },
+          "description": "Divisional chart data (D-2, D-9, D-10, etc.)."
+        },
+        "dashaTree": {
+          "type": "unknown",
+          "description": "Vimshottari dasha tree."
+        },
+        "extensions": {
+          "type": "unknown",
+          "description": "Extension point for tradition-specific fields (e.g., shadbala scores, ashtakavarga)."
+        }
+      }
+    }
+  }
+}

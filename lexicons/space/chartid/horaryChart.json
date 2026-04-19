@@ -1,0 +1,98 @@
+{
+  "lexicon": 1,
+  "id": "space.chartid.horaryChart",
+  "description": "Horary (Western) or Prashna (Jyotish) chart. Cast for the moment a sincere question is understood by the astrologer. questionDatetime is required. The question itself may be kept private.",
+  "defs": {
+    "record": {
+      "type": "record",
+      "key": "tid",
+      "description": "Horary/Prashna chart. The chart is cast for the moment the astrologer receives and understands the question, not when the querent thinks of it. questionDatetime is therefore the astrologer's receipt moment.",
+      "required": ["schemaVersion", "traditions", "questionDatetime", "createdAt"],
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "const": "1.0.0",
+          "description": "Schema version. Breaking changes bump to 2.0.0 in a new lexicon file."
+        },
+        "traditions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Astrological traditions represented, e.g. ['western'] or ['jyotish']."
+        },
+        "questionDatetime": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Datetime the question was received and understood by the astrologer (ISO 8601). Required."
+        },
+        "questionSummary": {
+          "type": "string",
+          "maxLength": 512,
+          "description": "Optional brief summary of the question category (e.g., 'Will I get the job?', 'Lost object — where is it?'). May be omitted for privacy."
+        },
+        "querentDid": {
+          "type": "string",
+          "description": "Optional DID of the person who asked the question. Set only with their consent."
+        },
+        "place": {
+          "type": "object",
+          "description": "Location where the question was received.",
+          "properties": {
+            "placeName": { "type": "string", "maxLength": 256 },
+            "coordinate": {
+              "type": "object",
+              "properties": {
+                "latitude": { "type": "string" },
+                "longitude": { "type": "string" }
+              }
+            },
+            "timezone": { "type": "string" }
+          }
+        },
+        "radicality": {
+          "type": "string",
+          "knownValues": ["radical", "non-radical", "unknown"],
+          "description": "Whether the chart is considered radical (fit to judge) by the astrologer. Western horary concept."
+        },
+        "judgment": {
+          "type": "string",
+          "maxLength": 1024,
+          "description": "Optional astrologer's judgment or delineation notes. May be omitted or kept private."
+        },
+        "western": {
+          "type": "object",
+          "description": "Western tropical astrological data. See space.chartid.defs#westernData.",
+          "properties": {
+            "houseSystem": { "type": "string" },
+            "ascendant": { "type": "string" },
+            "midheaven": { "type": "string" },
+            "planets": { "type": "array", "items": { "type": "unknown" } },
+            "houseCusps": { "type": "array", "items": { "type": "unknown" } },
+            "extensions": { "type": "unknown" }
+          }
+        },
+        "jyotish": {
+          "type": "object",
+          "description": "Jyotish/Prashna astrological data. See space.chartid.defs#jyotishData.",
+          "properties": {
+            "ayanamsa": { "type": "string" },
+            "ayanamsaDegrees": { "type": "string" },
+            "houseSystem": { "type": "string" },
+            "ascendant": { "type": "string" },
+            "planets": { "type": "array", "items": { "type": "unknown" } },
+            "houseCusps": { "type": "array", "items": { "type": "unknown" } },
+            "extensions": { "type": "unknown" }
+          }
+        },
+        "extensions": {
+          "type": "unknown",
+          "description": "Top-level extension point for fields not yet in spec."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Timestamp when this record was created (ISO 8601)."
+        }
+      }
+    }
+  }
+}
