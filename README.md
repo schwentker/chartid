@@ -175,10 +175,6 @@ User profile settings. One record per DID (`key: "self"`).
 Swiss Ephemeris, TypeScript, Lahiri ayanamsa. Produces ChartID-format
 Jyotish output. Vimshottari dasha calculation.
 
-**[Artiji](https://artiji.xyz)** — first consumer app writing
-`space.chartid.natalChart` records. Astrological greeting card platform;
-chart data generated at card creation, written to user ATProto repo on consent.
-
 ---
 
 ## RFC
