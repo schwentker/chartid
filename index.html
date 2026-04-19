@@ -366,6 +366,42 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
+  /* ─── privacy table ─── */
+  .priv-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .priv-table th {
+    font-size: 9px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 10px 14px 8px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 400;
+  }
+  .priv-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    line-height: 1.6;
+    vertical-align: top;
+  }
+  .priv-table tr:last-child td { border-bottom: none; }
+  .priv-table td:first-child {
+    color: var(--teal);
+    white-space: nowrap;
+  }
+  .priv-table td code {
+    color: var(--gold);
+    font-size: 10px;
+  }
+
   @media (max-width: 500px) {
     .planet { font-size: 9px; }
     .sign-name { font-size: 7px; }
@@ -513,7 +549,8 @@
   <span class="j-key">"traditions"</span>:      <span class="j-brace">[</span><span class="j-str">"jyotish"</span><span class="j-brace">]</span>,
 
   <span class="j-key">"birthDatetime"</span>:   <span class="j-str">"2021-10-04"</span>,  <span class="j-comment">// date only — time unknown</span>
-  <span class="j-key">"timeConfidence"</span>:  <span class="j-str">"unknown"</span>,
+  <span class="j-key">"timeConfidence"</span>:  <span class="j-str">"unknown"</span>,      <span class="j-comment">// full scale: exact | approximate | unknown | rectified</span>
+  <span class="j-key">"birthTimeTrust"</span>:  <span class="j-str">"unknown"</span>,      <span class="j-comment">// simpler signal: exact | approximate | unknown</span>
   <span class="j-key">"birthPlace"</span>: <span class="j-brace">{</span>
     <span class="j-key">"placeName"</span>:    <span class="j-str">"Wilmington, DE, USA"</span>,
     <span class="j-key">"coordinate"</span>:  <span class="j-brace">{</span> <span class="j-key">"latitude"</span>: <span class="j-str">"39.733300"</span>, <span class="j-key">"longitude"</span>: <span class="j-str">"-75.533300"</span> <span class="j-brace">}</span>,
@@ -538,6 +575,183 @@
   <span class="j-brace">}</span>,
 
   <span class="j-key">"createdAt"</span>: <span class="j-str">"2025-01-01T00:00:00.000Z"</span>
+<span class="j-brace">}</span></pre>
+
+    <div style="font-size:10px; color:var(--muted); line-height:1.9; letter-spacing:.03em; margin-top:14px;">
+      <code style="color:var(--gold);font-size:10px;">timeConfidence</code> covers the full epistemic scale — including <code style="color:var(--gold);font-size:10px;">"rectified"</code> for times derived by an astrologer from life events, which has no equivalent in the simpler field.&ensp;
+      <code style="color:var(--gold);font-size:10px;">birthTimeTrust</code> is a three-value signal (<code style="color:var(--gold);font-size:10px;">exact</code> / <code style="color:var(--gold);font-size:10px;">approximate</code> / <code style="color:var(--gold);font-size:10px;">unknown</code>) suited for apps that don't need to distinguish rectification from other approximations.&ensp;
+      Both fields are optional; use one or both — they're complementary, not redundant.
+    </div>
+  </section>
+
+  <!-- ─── Privacy ─── -->
+  <section id="privacy" style="animation: fadein .8s .5s ease both; margin-bottom: 60px;">
+    <div class="section-label">privacy & encryption</div>
+
+    <table class="priv-table">
+      <thead>
+        <tr>
+          <th>visibility</th>
+          <th>meaning</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>"public"</td>
+          <td>Anyone on ATProto can read the record.</td>
+        </tr>
+        <tr>
+          <td>"private"</td>
+          <td>Convention — DID owner only. Not enforced by the protocol. Encrypt <code>birthDatetime</code> as JWE for real confidentiality.</td>
+        </tr>
+        <tr>
+          <td>"friends"</td>
+          <td>Reserved. Social graph access — future feature.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="font-size:10px; color:var(--muted); letter-spacing:.04em; margin-bottom:8px;">
+      For <code style="color:var(--gold);font-size:10px;">visibility: "private"</code> — encrypt <code style="color:var(--gold);font-size:10px;">birthDatetime</code> as JWE via <a href="https://github.com/panva/jose" style="color:var(--teal);text-decoration:none;">jose</a> and store ciphertext in <code style="color:var(--gold);font-size:10px;">encryptedData</code>. Omit the plaintext field.
+    </div>
+
+    <pre style="margin-bottom:20px;"><span class="j-comment">// encrypt birthDatetime before posting a private chart</span>
+<span class="j-type">import</span> <span class="j-brace">{</span> <span class="j-key">CompactEncrypt</span> <span class="j-brace">}</span> <span class="j-type">from</span> <span class="j-str">'jose'</span>;
+
+<span class="j-type">const</span> jwe = <span class="j-type">await new</span> <span class="j-key">CompactEncrypt</span>(<span class="j-type">new</span> <span class="j-key">TextEncoder</span>().<span class="j-key">encode</span>(birthDatetime))
+  .<span class="j-key">setProtectedHeader</span>(<span class="j-brace">{</span> <span class="j-key">alg</span>: <span class="j-str">'RSA-OAEP-256'</span>, <span class="j-key">enc</span>: <span class="j-str">'A256GCM'</span> <span class="j-brace">}</span>)
+  .<span class="j-key">encrypt</span>(recipientPublicKey);
+
+<span class="j-type">const</span> record = <span class="j-brace">{</span>
+  <span class="j-key">encryptedData</span>: jwe,
+  <span class="j-key">visibility</span>:    <span class="j-str">"private"</span>,
+  <span class="j-comment">// birthDatetime omitted</span>
+<span class="j-brace">}</span>;</pre>
+
+    <div class="protocol-section" style="margin-bottom:12px; animation:none;">
+      <div class="proto-card">
+        <h3>Data retention</h3>
+        <p>Records exist only in your PDS. Delete anytime via <code>com.atproto.repo.deleteRecord</code>. No central server retains copies. AppViews may cache — ATProto's firehose makes erasure eventual, not instant.</p>
+      </div>
+      <div class="proto-card">
+        <h3>Compliance</h3>
+        <p>You control your PDS; you are the data controller. <code>subjectDid</code> creates identity linkage — set only with consent. GDPR right to erasure: delete the record. Age-gating for minors is an app responsibility.</p>
+      </div>
+    </div>
+
+    <div style="font-size:10px; color:var(--muted); letter-spacing:.04em;">
+      Full implementation guide →&nbsp;<a href="https://github.com/schwentker/chartid/blob/main/PRIVACY.md" style="color:var(--teal); text-decoration:none; letter-spacing:.04em;">PRIVACY.md</a>
+    </div>
+  </section>
+
+  <!-- ─── Verification ─── -->
+  <section id="verification" style="animation: fadein .8s .5s ease both; margin-bottom: 60px;">
+    <div class="section-label">verification · space.chartid.chartVerification</div>
+
+    <div class="protocol-section" style="margin-bottom:20px; animation:none;">
+      <div class="proto-card">
+        <h3>Rectification</h3>
+        <p>When birth time is unknown, a skilled astrologer derives it from life events. <code>verificationLabel: "astrologer-attested"</code> records who did that work and makes it citable by any app.</p>
+      </div>
+      <div class="proto-card">
+        <h3>Witness</h3>
+        <p>A family member, physician, or registrar who knows the birth time can post an attestation from their own DID. Their key signs it — accountability is cryptographic, not social.</p>
+      </div>
+      <div class="proto-card">
+        <h3>Self-declaration</h3>
+        <p><code>"self-declared"</code> is a valid label. Not all charts need external verification to be useful. Apps decide how much weight to assign each label type.</p>
+      </div>
+    </div>
+
+    <table class="priv-table" style="margin-bottom:20px;">
+      <thead>
+        <tr>
+          <th>verificationLabel</th>
+          <th>meaning</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>"birth-certificate-verified"</td>
+          <td>Verifier has seen an official birth record. Strongest signal.</td>
+        </tr>
+        <tr>
+          <td>"astrologer-attested"</td>
+          <td>Professional astrologer vouches for chart accuracy — date, time, place, and calculation method.</td>
+        </tr>
+        <tr>
+          <td>"historical-figure"</td>
+          <td>Publicly documented time and place for a historical or public entity. No private birth record required.</td>
+        </tr>
+        <tr>
+          <td>"self-declared"</td>
+          <td>Subject attests to their own data. No external verification.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">demo attestation · space.chartid.chartVerification</div>
+
+    <div class="record-header">
+      <div class="did-badge">
+        <span>did:plc:</span>qx7kmnb4wjyotish2rzlp3va
+      </div>
+      <div style="font-size:10px; color:var(--muted);">
+        collection: space.chartid.chartVerification
+      </div>
+    </div>
+
+    <pre style="margin-bottom:20px;"><span class="j-brace">{</span>
+  <span class="j-key">"$type"</span>:             <span class="j-type">"space.chartid.chartVerification"</span>,
+
+  <span class="j-key">"chartUri"</span>:          <span class="j-str">"at://did:plc:vn3xu7k2r4chartid2021oct04/space.chartid.natalChart/3jz4a2bxmfp2"</span>,
+  <span class="j-key">"verifierDid"</span>:       <span class="j-str">"did:plc:qx7kmnb4wjyotish2rzlp3va"</span>,
+  <span class="j-key">"verificationLabel"</span>: <span class="j-str">"astrologer-attested"</span>,
+  <span class="j-key">"notes"</span>:             <span class="j-str">"Date and timezone confirmed against public incorporation records. Lahiri ayanamsa, WholeSign houses verified."</span>,
+
+  <span class="j-key">"createdAt"</span>: <span class="j-str">"2025-03-15T10:22:00.000Z"</span>
+<span class="j-brace">}</span></pre>
+
+    <div class="protocol-section" style="margin-bottom:0; animation:none;">
+      <div class="proto-card">
+        <h3>Verifier graph</h3>
+        <p>Each attestation lives in the verifier's own repo, signed by their key. Any AppView can query all <code>chartVerification</code> records pointing to a given <code>chartUri</code>. The union is the trust graph. Weight by social graph, attestation count, or verifier reputation. No central authority required.</p>
+      </div>
+      <div class="proto-card">
+        <h3>Composable by design</h3>
+        <p>Multiple verifiers can independently attest to the same chart. A feed generator showing "verified charts only" queries the firehose for <code>space.chartid.chartVerification</code> records and filters by label. No special index or permissioned API needed.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Settings ─── -->
+  <section id="settings" style="animation: fadein .8s .5s ease both; margin-bottom: 60px;">
+    <div class="section-label">settings · space.chartid.settings</div>
+
+    <p style="font-size:11px; color:var(--muted); line-height:1.8; margin-bottom:20px; max-width:640px;">
+      The <code style="color:var(--gold); font-size:10px;">settings</code> record is a singleton — <code style="color:var(--gold); font-size:10px;">key: "self"</code> means exactly one can exist per DID, written and overwritten in place rather than appended to a collection. Apps read it to resolve a user's primary chart without guessing which of many <code style="color:var(--gold); font-size:10px;">natalChart</code> records to surface: western, jyotish, rectified versions all coexist; <code style="color:var(--gold); font-size:10px;">primaryChartUri</code> is the explicit pointer. The same record carries visibility defaults and tradition context so apps can set sensible UI defaults without asking the user to configure them twice.
+    </p>
+
+    <div class="record-header">
+      <div class="did-badge">
+        <span>did:plc:</span>vn3xu7k2r4chartid2021oct04
+      </div>
+      <div style="font-size:10px; color:var(--muted);">
+        collection: space.chartid.settings · key: self
+      </div>
+    </div>
+
+    <pre><span class="j-brace">{</span>
+  <span class="j-key">"$type"</span>: <span class="j-type">"space.chartid.settings"</span>,
+
+  <span class="j-key">"primaryChartUri"</span>:    <span class="j-str">"at://did:plc:vn3xu7k2r4chartid2021oct04/space.chartid.natalChart/3jz4a2bxmfp2"</span>,
+  <span class="j-key">"defaultVisibility"</span>:  <span class="j-str">"public"</span>,
+  <span class="j-key">"displayName"</span>:        <span class="j-str">"Bluesky PBC — Incorporation Chart"</span>,
+  <span class="j-key">"bio"</span>:                <span class="j-str">"Jyotish chart for Bluesky PBC. Date from public DE incorporation records. Time unknown — noon chart, Lagna approximate."</span>,
+  <span class="j-key">"traditions"</span>:         <span class="j-brace">[</span><span class="j-str">"jyotish"</span><span class="j-brace">]</span>,
+
+  <span class="j-key">"createdAt"</span>:  <span class="j-str">"2025-01-01T00:00:00.000Z"</span>,
+  <span class="j-key">"updatedAt"</span>:  <span class="j-str">"2025-03-15T10:22:00.000Z"</span>
 <span class="j-brace">}</span></pre>
   </section>
 
@@ -571,6 +785,16 @@
 <span class="j-type">space.chartid.horaryChart</span>      <span class="j-comment">// horary / prashna — question at a moment</span>
 <span class="j-type">space.chartid.electionalChart</span>  <span class="j-comment">// muhurta — elected auspicious timing</span>
 <span class="j-type">space.chartid.defs</span>             <span class="j-comment">// shared types across all record types</span></pre>
+  </section>
+
+  <!-- ─── Contributing ─── -->
+  <section id="contributing" style="animation: fadein .8s .8s ease both; margin-bottom: 52px;">
+    <div class="section-label">contributing</div>
+    <p style="font-size:11px; color:var(--muted); line-height:1.9; max-width:640px;">
+      Schema changes follow semantic versioning — patch for description improvements, minor for new optional fields, major for breaking changes requiring a new lexicon file and RFC comment period.
+      All proposals must pass the lexicon style guide (no floats, <code style="color:var(--gold);font-size:10px;">knownValues</code> not closed enums, explicit house systems) and a privacy review checklist for any field that touches PII.
+      See <a href="https://github.com/schwentker/chartid/blob/main/CONTRIBUTING.md" style="color:var(--teal);text-decoration:none;">CONTRIBUTING.md</a> for the full process.
+    </p>
   </section>
 
   <!-- ─── Footer ─── -->
